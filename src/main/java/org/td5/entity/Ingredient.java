@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.td5.entity.enums.CategoryEnum;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
