@@ -1,5 +1,6 @@
 package org.td5.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +18,6 @@ public class Ingredient {
     private String name;
     private CategoryEnum category;
     private Double price;
+    @JsonIgnore
     private List<StockMovement> stockMovementList;
 }
