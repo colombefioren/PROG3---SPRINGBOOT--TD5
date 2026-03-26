@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.td5.entity.Ingredient;
+import org.td5.exception.NotFoundException;
 import org.td5.service.IngredientService;
 
 @RestController

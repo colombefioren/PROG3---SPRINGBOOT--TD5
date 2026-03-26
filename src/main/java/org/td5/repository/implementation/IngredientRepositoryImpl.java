@@ -48,12 +48,34 @@ select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_categ
             return ingredients;
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }finally{
+            dataSource.attemptCloseDBConnection(rs, pstmt, conn);
         }
     }
 
     @Override
     public Ingredient getIngredientById(Integer id) {
-        return null;
+        String sql = """
+                  select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_category from ingredient i where i.id = ?
+""";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try{
+            conn = dataSource.getDBConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            rs = pstmt.executeQuery();
+
+            if(rs.next()){
+                return mapResultSetToIngredient(rs);
+            }else{
+                throw new RuntimeException("Ingredient.id=" + id + " is not found");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
