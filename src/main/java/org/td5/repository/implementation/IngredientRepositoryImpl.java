@@ -76,6 +76,8 @@ select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_categ
       return ingredient;
     } catch (SQLException e) {
       throw new RuntimeException(e);
+    }finally{
+      dataSource.attemptCloseDBConnection(rs, pstmt, conn);
     }
   }
 
