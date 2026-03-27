@@ -21,14 +21,17 @@ public class IngredientService {
 
   public Ingredient getIngredientById(Integer id) throws NotFoundException {
     Ingredient ingredient = repository.findById(id);
-    if(ingredient == null){
+    if (ingredient == null) {
       throw new NotFoundException("Ingredient.id=" + id + " is not found");
-    }else{
-      return ingredient;
     }
+    return ingredient;
   }
 
-  public StockValue getIngredientStockValue(Integer ingredientId, Instant at, UnitType unit) {
-    return repository.findById(ingredientId).getStockValue(at, unit);
+  public StockValue getIngredientStockValue(Integer ingredientId, Instant at, UnitType unit) throws NotFoundException {
+    Ingredient ingredient = repository.findById(ingredientId);
+    if (ingredient == null) {
+      throw new NotFoundException("Ingredient.id=" + ingredientId + " is not found");
+    }
+    return ingredient.getStockValue(at, unit);
   }
 }
