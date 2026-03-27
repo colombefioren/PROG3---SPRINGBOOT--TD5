@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.td5.entity.Dish;
 import org.td5.entity.Ingredient;
+import org.td5.exception.NotFoundException;
 import org.td5.service.DishService;
 
 @RestController
@@ -21,7 +22,19 @@ public class DishController {
   }
 
   @PutMapping("/{id}/ingredients")
-  public ResponseEntity<?> updateIngredientsInDish(@PathVariable Integer id,@RequestBody(required = false) List<Ingredient> ingredientList) {
-
+  public ResponseEntity<?> updateIngredientsInDish(
+      @PathVariable Integer id, @RequestBody(required = false) List<Ingredient> ingredientList) {
+    if (ingredientList == null) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+          .body("A list of ingredients must be provided");
+    }
+    try {
+      return ResponseEntity.status(HttpStatus.OK)
+          .body(service.updateIngredientsInDish(id, ingredientList));
+    } catch (NotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
   }
 }
