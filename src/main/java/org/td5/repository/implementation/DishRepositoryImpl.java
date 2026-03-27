@@ -124,7 +124,7 @@ public class DishRepositoryImpl implements DishRepository {
         .id(rs.getInt("di_id"))
         .quantityRequired(rs.getDouble("di_quantity_required"))
         .unit(UnitType.valueOf(rs.getString("di_unit")))
-        .ingredient(findIngredientById(rs.getInt("di_ingredient")))
+        .ingredient(findIngredientById(rs.getInt("id_ingredient")))
         .build();
   }
 }
