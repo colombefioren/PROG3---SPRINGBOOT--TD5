@@ -10,4 +10,6 @@ public interface DishRepository {
     List<Dish> findAll();
     Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList);
     List<DishIngredient> findDishIngredientsByDishId(Integer dishId);
+    Dish findById(Integer id);
+
 }

@@ -56,11 +56,6 @@ public class DishRepositoryImpl implements DishRepository {
         deletePs.setInt(1, dishId);
         deletePs.executeUpdate();
       }
-
-      if (ingredientList == null || ingredientList.isEmpty()) {
-        return null;
-      }
-
       try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
 
         for (Ingredient ingredient : ingredientList) {
@@ -105,6 +100,26 @@ public class DishRepositoryImpl implements DishRepository {
 
     } catch (SQLException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public Dish findById(Integer id) {
+    String sql =
+        """
+                  select d.id as d_id, d.name as d_name, d.dish_type, d.selling_price as d_price from dish d where d.id = ?
+                """;
+    try(
+            Connection conn = dataSource.getDBConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            ) {
+      if(rs.next()){
+        return mapResultSetToDish(rs);
+      }
+      return null;
+    } catch (SQLException e) {
+        throw new RuntimeException(e);
     }
   }
 
