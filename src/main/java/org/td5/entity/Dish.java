@@ -20,7 +20,6 @@ public class Dish {
     private Double price;
     @JsonIgnore
     private DishTypeEnum dishType;
-    @JsonIgnore
     private List<DishIngredient> dishIngredients;
 
     public void setDishIngredients(List<DishIngredient> newDishIngredients) {
