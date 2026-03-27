@@ -1,21 +1,18 @@
 package org.td5.repository.implementation;
 
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Repository;
-import org.td5.configuration.DataSource;
-import org.td5.entity.Ingredient;
-import org.td5.entity.IngredientStock;
-import org.td5.entity.enums.CategoryEnum;
-import org.td5.entity.enums.UnitType;
-import org.td5.repository.IngredientRepository;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Repository;
+import org.td5.configuration.DataSource;
+import org.td5.entity.Ingredient;
+import org.td5.entity.StockMovement;
+import org.td5.entity.enums.CategoryEnum;
+import org.td5.repository.IngredientRepository;
 
 @Repository
 @AllArgsConstructor
@@ -30,26 +27,19 @@ select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_categ
                             from ingredient i
                             order by i.id
 """;
-    Connection conn = null;
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
 
-    try {
-      conn = dataSource.getDBConnection();
-      pstmt = conn.prepareStatement(sql);
-      rs = pstmt.executeQuery();
+    List<Ingredient> ingredients = new ArrayList<>();
 
-      List<Ingredient> ingredients = new ArrayList<>();
+    try (Connection conn = dataSource.getDBConnection();
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery()) {
 
       while (rs.next()) {
         ingredients.add(mapResultSetToIngredient(rs));
       }
-
       return ingredients;
     } catch (SQLException e) {
       throw new RuntimeException(e);
-    } finally {
-      dataSource.attemptCloseDBConnection(rs, pstmt, conn);
     }
   }
 
@@ -59,30 +49,29 @@ select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_categ
 """
                   select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_category from ingredient i where i.id = ?
 """;
-    Connection conn = null;
-    PreparedStatement pstmt = null;
-    ResultSet rs = null;
 
-    try {
-      conn = dataSource.getDBConnection();
-      pstmt = conn.prepareStatement(sql);
-      pstmt.setInt(1, id);
-      rs = pstmt.executeQuery();
-      Ingredient ingredient = null;
+    Ingredient ingredient = null;
 
-      if (rs.next()) {
-        ingredient = mapResultSetToIngredient(rs);
+    try (Connection conn = dataSource.getDBConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)) {
+      ps.setInt(1, id);
+
+      try (ResultSet rs = ps.executeQuery()) {
+
+        if (rs.next()) {
+          ingredient = mapResultSetToIngredient(rs);
+        }
       }
+
       return ingredient;
     } catch (SQLException e) {
       throw new RuntimeException(e);
-    }finally{
-      dataSource.attemptCloseDBConnection(rs, pstmt, conn);
     }
   }
 
   @Override
-  public IngredientStock getIngredientStockById(Integer id, Instant at, UnitType unit) {
+  public List<StockMovement> findStockMovementsByIngredientId(Integer id) {
+
     return null;
   }
 
