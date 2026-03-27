@@ -1,5 +1,6 @@
 package org.td5.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,9 @@ import java.util.List;
 public class Dish {
     private Integer id;
     private String name;
-    private DishTypeEnum dishType;
-    private List<DishIngredient> dishIngredients;
     private Double price;
+    @JsonIgnore
+    private DishTypeEnum dishType;
+    @JsonIgnore
+    private List<DishIngredient> dishIngredients;
 }
