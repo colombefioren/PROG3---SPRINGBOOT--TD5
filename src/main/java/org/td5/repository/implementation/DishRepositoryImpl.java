@@ -62,6 +62,7 @@ public class DishRepositoryImpl implements DishRepository {
           if (ingredient != null && ingredient.getId() != null) {
             insertPs.setInt(1, dishId);
             insertPs.setInt(2, ingredient.getId());
+            insertPs.setInt(3, ingredient.getId());
             insertPs.addBatch();
           }
         }
