@@ -6,6 +6,7 @@ import org.td5.configuration.DataSource;
 import org.td5.entity.Dish;
 import org.td5.entity.DishIngredient;
 import org.td5.entity.Ingredient;
+import org.td5.entity.enums.UnitType;
 import org.td5.repository.DishRepository;
 
 import java.sql.Connection;
@@ -29,8 +30,8 @@ public class DishRepositoryImpl implements DishRepository {
 
         List<Dish> dishes = new ArrayList<>();
 
-        try(Connection con = dataSource.getDBConnection();
-            PreparedStatement ps = con.prepareStatement(sql);
+        try(Connection conn = dataSource.getDBConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery()
             ){
 
@@ -51,7 +52,29 @@ public class DishRepositoryImpl implements DishRepository {
 
     @Override
     public List<DishIngredient> findDishIngredientsByDishId(Integer dishId) {
-        return List.of();
+        String sql = """
+ select di.id as di_id, di.id_dish, di.id_ingredient, di.quantity_required as di_quantity_required, di.unit as di_unit from dish_ingredient di where di.id_dish = ?
+""";
+
+        List<DishIngredient> dishIngredients = new ArrayList<>();
+
+        try(Connection conn = dataSource.getDBConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ){
+
+            ps.setInt(1, dishId);
+
+            try(ResultSet rs = ps.executeQuery()){
+                while(rs.next()){
+                    dishIngredients.add(mapResultSetToDishIngredient(rs));
+                }
+            }
+
+            return dishIngredients;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Dish mapResultSetToDish(ResultSet rs) throws SQLException {
@@ -60,5 +83,13 @@ public class DishRepositoryImpl implements DishRepository {
                 .name(rs.getString("d_name"))
                 .price(rs.getDouble("d_price"))
                 .build();
+    }
+
+    private DishIngredient mapResultSetToDishIngredient(ResultSet rs) throws SQLException {
+        return DishIngredient.builder()
+                .id(rs.getInt("di_id"))
+                .quantityRequired(rs.getDouble("di_quantity_required"))
+                .unit(UnitType.valueOf(rs.getString("di_unit")))
+                        .ingredient(findIngredientById(rs.getInt("di_ingredient"))).build();
     }
 }
