@@ -48,7 +48,7 @@ public class DishRepositoryImpl implements DishRepository {
   public Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList) {
 
     String deleteSql = "delete from dish_ingredient where id_dish = ?";
-    String insertSql = "insert into dish_ingredient (id_dish, id_ingredient) select ?, ? where exists (select 1 from ingredient where id = ?)";
+    String insertSql = "insert into dish_ingredient (id_dish, id_ingredient) values (?, ?)";
 
     try (Connection conn = dataSource.getDBConnection()) {
 
@@ -59,14 +59,18 @@ public class DishRepositoryImpl implements DishRepository {
       try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
 
         for (Ingredient ingredient : ingredientList) {
+          System.out.println("Processing ingredient: " + ingredient);
+
           if (ingredient != null && ingredient.getId() != null) {
+            System.out.println("Adding to batch: " + ingredient.getId());
+
             insertPs.setInt(1, dishId);
             insertPs.setInt(2, ingredient.getId());
-            insertPs.setInt(3, ingredient.getId());
             insertPs.addBatch();
           }
         }
 
+        System.out.println("Executing batch...");
         insertPs.executeBatch();
       }
 
@@ -113,10 +117,12 @@ public class DishRepositoryImpl implements DishRepository {
     try(
             Connection conn = dataSource.getDBConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
             ) {
-      if(rs.next()){
-        return mapResultSetToDish(rs);
+      ps.setInt(1, id);
+      try(ResultSet rs = ps.executeQuery()) {
+        if(rs.next()){
+          return mapResultSetToDish(rs);
+        }
       }
       return null;
     } catch (SQLException e) {

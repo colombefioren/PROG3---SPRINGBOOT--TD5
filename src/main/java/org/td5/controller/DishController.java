@@ -28,6 +28,8 @@ public class DishController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body("A list of ingredients must be provided");
     }
+    System.out.println(id);
+    System.out.println(ingredientList);
     try {
       return ResponseEntity.status(HttpStatus.OK)
           .body(service.updateIngredientsInDish(id, ingredientList));
