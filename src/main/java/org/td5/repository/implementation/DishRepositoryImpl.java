@@ -59,18 +59,12 @@ public class DishRepositoryImpl implements DishRepository {
       try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
 
         for (Ingredient ingredient : ingredientList) {
-          System.out.println("Processing ingredient: " + ingredient);
-
           if (ingredient != null && ingredient.getId() != null) {
-            System.out.println("Adding to batch: " + ingredient.getId());
-
             insertPs.setInt(1, dishId);
             insertPs.setInt(2, ingredient.getId());
             insertPs.addBatch();
           }
         }
-
-        System.out.println("Executing batch...");
         insertPs.executeBatch();
       }
 
@@ -114,19 +108,17 @@ public class DishRepositoryImpl implements DishRepository {
         """
                   select d.id as d_id, d.name as d_name, d.dish_type, d.selling_price as d_price from dish d where d.id = ?
                 """;
-    try(
-            Connection conn = dataSource.getDBConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ) {
+    try (Connection conn = dataSource.getDBConnection();
+        PreparedStatement ps = conn.prepareStatement(sql); ) {
       ps.setInt(1, id);
-      try(ResultSet rs = ps.executeQuery()) {
-        if(rs.next()){
+      try (ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) {
           return mapResultSetToDish(rs);
         }
       }
       return null;
     } catch (SQLException e) {
-        throw new RuntimeException(e);
+      throw new RuntimeException(e);
     }
   }
 
