@@ -3,6 +3,7 @@ package org.td5.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.td5.entity.Dish;
+import org.td5.entity.Ingredient;
 import org.td5.repository.DishRepository;
 
 import java.util.List;
@@ -14,5 +15,9 @@ public class DishService {
 
   public List<Dish> getAllDishes() {
     return repository.findAll();
+  }
+
+  public Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList) {
+    return repository.updateIngredientsInDish(dishId, ingredientList);
   }
 }
