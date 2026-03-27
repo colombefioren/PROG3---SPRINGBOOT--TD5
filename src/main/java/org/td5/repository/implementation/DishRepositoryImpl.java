@@ -48,7 +48,7 @@ public class DishRepositoryImpl implements DishRepository {
   public Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList) {
 
     String deleteSql = "delete from dish_ingredient where id_dish = ?";
-    String insertSql = "insert into dish_ingredient (id_dish, id_ingredient) VALUES (?, ?)";
+    String insertSql = "insert into dish_ingredient (id_dish, id_ingredient) select ?, ? where exists (select 1 from ingredient where id = ?)";
 
     try (Connection conn = dataSource.getDBConnection()) {
 
