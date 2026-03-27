@@ -1,9 +1,12 @@
 package org.td5.service;
 
+import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.td5.entity.Ingredient;
+import org.td5.entity.StockValue;
+import org.td5.entity.enums.UnitType;
 import org.td5.exception.NotFoundException;
 import org.td5.repository.IngredientRepository;
 
@@ -23,5 +26,9 @@ public class IngredientService {
     }else{
       return ingredient;
     }
+  }
+
+  public StockValue getIngredientStockValue(Integer ingredientId, Instant at, UnitType unit) {
+    return repository.findById(ingredientId).getStockValue(at, unit);
   }
 }
