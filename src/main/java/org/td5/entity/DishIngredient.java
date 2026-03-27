@@ -1,5 +1,6 @@
 package org.td5.entity;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,7 @@ import org.td5.entity.enums.UnitType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIncludeProperties({"ingredient"})
 public class DishIngredient {
     private Integer id;
     private Dish dish;
