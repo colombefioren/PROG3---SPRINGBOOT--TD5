@@ -101,6 +101,7 @@ select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_categ
         .name(rs.getString("i_name"))
         .category(CategoryEnum.valueOf(rs.getString("i_category")))
         .price(rs.getDouble("i_price"))
+        .stockMovementList(findStockMovementsByIngredientId(rs.getInt("i_id")))
         .build();
   }
 
