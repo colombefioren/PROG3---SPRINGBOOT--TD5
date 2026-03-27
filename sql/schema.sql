@@ -24,8 +24,8 @@ create table dish_ingredient
     id                serial primary key,
     id_dish           int            not null,
     id_ingredient     int            not null,
-    quantity_required numeric(10, 2) not null,
-    unit              unit_type      not null,
+    quantity_required numeric(10, 2),
+    unit              unit_type     ,
     constraint dish_fk
         foreign key (id_dish)
             references Dish (id)

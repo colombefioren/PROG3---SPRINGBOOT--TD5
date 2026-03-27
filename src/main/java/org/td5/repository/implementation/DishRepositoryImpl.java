@@ -46,7 +46,39 @@ public class DishRepositoryImpl implements DishRepository {
 
   @Override
   public Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList) {
-    return null;
+
+    String deleteSql = "delete from dish_ingredient where id_dish = ?";
+    String insertSql = "insert into dish_ingredient (id_dish, id_ingredient) VALUES (?, ?)";
+
+    try (Connection conn = dataSource.getDBConnection()) {
+
+      try (PreparedStatement deletePs = conn.prepareStatement(deleteSql)) {
+        deletePs.setInt(1, dishId);
+        deletePs.executeUpdate();
+      }
+
+      if (ingredientList == null || ingredientList.isEmpty()) {
+        return null;
+      }
+
+      try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+
+        for (Ingredient ingredient : ingredientList) {
+          if (ingredient != null && ingredient.getId() != null) {
+            insertPs.setInt(1, dishId);
+            insertPs.setInt(2, ingredient.getId());
+            insertPs.addBatch();
+          }
+        }
+
+        insertPs.executeBatch();
+      }
+
+      return findById(dishId);
+
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
