@@ -10,9 +10,9 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class DishService {
-    private final DishRepository repository;
+  private final DishRepository repository;
 
-    public List<Dish> getAllDishes() {
-        return repository.findAll();
-    }
+  public List<Dish> getAllDishes() {
+    return repository.findAll();
+  }
 }
