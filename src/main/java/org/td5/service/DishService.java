@@ -20,7 +20,6 @@ public class DishService {
 
   public Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList) throws NotFoundException {
     Dish dish = repository.findById(dishId);
-    System.out.println(dish);
     if(dish == null){
       throw new NotFoundException("Dish.id=" + dishId + " is not found");
     }
