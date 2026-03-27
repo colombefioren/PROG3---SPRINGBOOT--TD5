@@ -13,11 +13,11 @@ public class IngredientService {
   private final IngredientRepository repository;
 
   public List<Ingredient> getAllIngredients() {
-    return repository.getAllIngredients();
+    return repository.findAll();
   }
 
   public Ingredient getIngredientById(Integer id) throws NotFoundException {
-    Ingredient ingredient = repository.getIngredientById(id);
+    Ingredient ingredient = repository.findById(id);
     if(ingredient == null){
       throw new NotFoundException("Ingredient.id=" + id + " is not found");
     }else{

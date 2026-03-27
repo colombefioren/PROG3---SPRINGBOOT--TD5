@@ -8,8 +8,8 @@ import java.time.Instant;
 import java.util.List;
 
 public interface IngredientRepository {
-    List<Ingredient> getAllIngredients();
-    Ingredient getIngredientById(Integer id);
+    List<Ingredient> findAll();
+    Ingredient findById(Integer id);
     IngredientStock getIngredientStockById(Integer id, Instant at, UnitType unit);
 
 }

@@ -23,7 +23,7 @@ public class IngredientRepositoryImpl implements IngredientRepository {
   private final DataSource dataSource;
 
   @Override
-  public List<Ingredient> getAllIngredients() {
+  public List<Ingredient> findAll() {
     String sql =
 """
 select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_category
@@ -54,7 +54,7 @@ select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_categ
   }
 
   @Override
-  public Ingredient getIngredientById(Integer id) {
+  public Ingredient findById(Integer id) {
     String sql =
 """
                   select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_category from ingredient i where i.id = ?
