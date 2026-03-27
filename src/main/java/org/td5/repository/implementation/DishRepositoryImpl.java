@@ -6,6 +6,7 @@ import org.td5.configuration.DataSource;
 import org.td5.entity.Dish;
 import org.td5.entity.DishIngredient;
 import org.td5.entity.Ingredient;
+import org.td5.entity.enums.CategoryEnum;
 import org.td5.entity.enums.UnitType;
 import org.td5.repository.DishRepository;
 
@@ -77,13 +78,48 @@ public class DishRepositoryImpl implements DishRepository {
         }
     }
 
+    private Ingredient findIngredientById(Integer id) {
+        String sql =
+                """
+                                  select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_category from ingredient i where i.id = ?
+                """;
+
+        Ingredient ingredient = null;
+
+        try (Connection conn = dataSource.getDBConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    ingredient = mapResultSetToIngredient(rs);
+                }
+            }
+
+            return ingredient;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private Dish mapResultSetToDish(ResultSet rs) throws SQLException {
         return Dish.builder()
                 .id(rs.getInt("d_id"))
                 .name(rs.getString("d_name"))
                 .price(rs.getDouble("d_price"))
+                .dishIngredients(findDishIngredientsByDishId(rs.getInt("d_id")))
                 .build();
     }
+    private Ingredient mapResultSetToIngredient(ResultSet rs) throws SQLException {
+        return Ingredient.builder()
+                .id(rs.getInt("i_id"))
+                .name(rs.getString("i_name"))
+                .category(CategoryEnum.valueOf(rs.getString("i_category")))
+                .price(rs.getDouble("i_price"))
+                .build();
+    }
+
 
     private DishIngredient mapResultSetToDishIngredient(ResultSet rs) throws SQLException {
         return DishIngredient.builder()
