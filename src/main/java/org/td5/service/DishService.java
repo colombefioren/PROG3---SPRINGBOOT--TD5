@@ -19,10 +19,8 @@ public class DishService {
   }
 
   public Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList) throws NotFoundException {
-    Dish dish = repository.findById(dishId);
-    if(dish == null){
-      throw new NotFoundException("Dish.id=" + dishId + " is not found");
-    }
+    Dish dish = repository.findById(dishId)
+            .orElseThrow(() -> new NotFoundException("Dish.id=" + dishId + " is not found"));
     return repository.updateIngredientsInDish(dishId, ingredientList);
   }
 }

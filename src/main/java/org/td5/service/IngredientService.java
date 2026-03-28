@@ -20,18 +20,13 @@ public class IngredientService {
   }
 
   public Ingredient getIngredientById(Integer id) throws NotFoundException {
-    Ingredient ingredient = repository.findById(id);
-    if (ingredient == null) {
-      throw new NotFoundException("Ingredient.id=" + id + " is not found");
-    }
-    return ingredient;
+    return repository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Ingredient.id=" + id + " is not found"));
   }
 
   public StockValue getIngredientStockValue(Integer ingredientId, Instant at, UnitType unit) throws NotFoundException {
-    Ingredient ingredient = repository.findById(ingredientId);
-    if (ingredient == null) {
-      throw new NotFoundException("Ingredient.id=" + ingredientId + " is not found");
-    }
+    Ingredient ingredient = repository.findById(ingredientId)
+            .orElseThrow(() -> new NotFoundException("Ingredient.id=" + ingredientId + " is not found"));
     return ingredient.getStockValue(at, unit);
   }
 }
