@@ -49,35 +49,48 @@ public class DishIngredientRepositoryImpl implements DishIngredientRepository {
 
   @Override
   public void saveAll(List<DishIngredient> dishIngredients) {
-    String sql = """
+    String sql =
+"""
 insert into dish_ingredient (id_dish,id_ingredient,quantity_required,unit)
 values (?,?,?,?)
 """;
 
-    try(Connection conn = dataSource.getDBConnection();
-    PreparedStatement pstmt = conn.prepareStatement(sql)){
-      for(DishIngredient dishIngredient : dishIngredients) {
+    try (Connection conn = dataSource.getDBConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+      for (DishIngredient dishIngredient : dishIngredients) {
         pstmt.setInt(1, dishIngredient.getId());
-        pstmt.setInt(2,dishIngredient.getIngredient().getId());
+        pstmt.setInt(2, dishIngredient.getIngredient().getId());
         pstmt.setDouble(3, dishIngredient.getQuantityRequired());
-        pstmt.setString(4,dishIngredient.getUnit().toString());
+        pstmt.setString(4, dishIngredient.getUnit().toString());
         pstmt.addBatch();
       }
       pstmt.executeBatch();
     } catch (SQLException e) {
-        throw new RuntimeException(e);
+      throw new RuntimeException(e);
     }
   }
 
   @Override
-  public void deleteByDishId(Integer dishId) {}
-
-    private DishIngredient mapResultSetToDishIngredient(ResultSet rs) throws SQLException {
-        return DishIngredient.builder()
-                .id(rs.getInt("di_id"))
-                .quantityRequired(rs.getDouble("di_quantity_required"))
-                .unit(rs.getString("di_unit") != null ? UnitType.valueOf(rs.getString("di_unit")) : null)
-                .ingredient(ingredientRepository.findById(rs.getInt("id_ingredient")).orElse(null))
-                .build();
+  public void deleteByDishId(Integer dishId) {
+    String sql =
+"""
+delete from dish_ingredient where id_dish = ?
+""";
+    try (Connection conn = dataSource.getDBConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql)) {
+      pstmt.setInt(1, dishId);
+      pstmt.executeUpdate();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
     }
+  }
+
+  private DishIngredient mapResultSetToDishIngredient(ResultSet rs) throws SQLException {
+    return DishIngredient.builder()
+        .id(rs.getInt("di_id"))
+        .quantityRequired(rs.getDouble("di_quantity_required"))
+        .unit(rs.getString("di_unit") != null ? UnitType.valueOf(rs.getString("di_unit")) : null)
+        .ingredient(ingredientRepository.findById(rs.getInt("id_ingredient")).orElse(null))
+        .build();
+  }
 }
