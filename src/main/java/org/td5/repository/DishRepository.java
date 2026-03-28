@@ -5,11 +5,12 @@ import org.td5.entity.DishIngredient;
 import org.td5.entity.Ingredient;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DishRepository {
     List<Dish> findAll();
     Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList);
     List<DishIngredient> findDishIngredientsByDishId(Integer dishId);
-    Dish findById(Integer id);
+    Optional<Dish> findById(Integer id);
 
 }

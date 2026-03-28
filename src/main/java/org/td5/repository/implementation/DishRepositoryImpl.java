@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.td5.configuration.DataSource;
@@ -68,7 +70,7 @@ public class DishRepositoryImpl implements DishRepository {
         insertPs.executeBatch();
       }
 
-      return findById(dishId);
+      return findById(dishId).orElse(null);
 
     } catch (SQLException e) {
       throw new RuntimeException(e);
@@ -103,45 +105,44 @@ public class DishRepositoryImpl implements DishRepository {
   }
 
   @Override
-  public Dish findById(Integer id) {
+  public Optional<Dish> findById(Integer id) {
     String sql =
-        """
-                  select d.id as d_id, d.name as d_name, d.dish_type, d.selling_price as d_price from dish d where d.id = ?
-                """;
+            """
+                      select d.id as d_id, d.name as d_name, d.dish_type, d.selling_price as d_price from dish d where d.id = ?
+                    """;
     try (Connection conn = dataSource.getDBConnection();
-        PreparedStatement ps = conn.prepareStatement(sql); ) {
+         PreparedStatement ps = conn.prepareStatement(sql); ) {
       ps.setInt(1, id);
       try (ResultSet rs = ps.executeQuery()) {
         if (rs.next()) {
-          return mapResultSetToDish(rs);
+          return Optional.of(mapResultSetToDish(rs));
         }
       }
-      return null;
+      return Optional.empty();
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private Ingredient findIngredientById(Integer id) {
+  private Optional<Ingredient> findIngredientById(Integer id) {
     String sql =
-        """
-                                  select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_category from ingredient i where i.id = ?
-                """;
+            """
+                                      select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_category from ingredient i where i.id = ?
+                    """;
 
-    Ingredient ingredient = null;
 
     try (Connection conn = dataSource.getDBConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)) {
+         PreparedStatement ps = conn.prepareStatement(sql)) {
       ps.setInt(1, id);
 
       try (ResultSet rs = ps.executeQuery()) {
 
         if (rs.next()) {
-          ingredient = mapResultSetToIngredient(rs);
+          return Optional.of(mapResultSetToIngredient(rs));
         }
       }
 
-      return ingredient;
+      return Optional.empty();
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -149,28 +150,29 @@ public class DishRepositoryImpl implements DishRepository {
 
   private Dish mapResultSetToDish(ResultSet rs) throws SQLException {
     return Dish.builder()
-        .id(rs.getInt("d_id"))
-        .name(rs.getString("d_name"))
-        .price(rs.getDouble("d_price"))
-        .dishIngredients(findDishIngredientsByDishId(rs.getInt("d_id")))
-        .build();
+            .id(rs.getInt("d_id"))
+            .name(rs.getString("d_name"))
+            .price(rs.getDouble("d_price"))
+            .dishIngredients(findDishIngredientsByDishId(rs.getInt("d_id")))
+            .build();
   }
 
   private Ingredient mapResultSetToIngredient(ResultSet rs) throws SQLException {
     return Ingredient.builder()
-        .id(rs.getInt("i_id"))
-        .name(rs.getString("i_name"))
-        .category(CategoryEnum.valueOf(rs.getString("i_category")))
-        .price(rs.getDouble("i_price"))
-        .build();
+            .id(rs.getInt("i_id"))
+            .name(rs.getString("i_name"))
+            .category(CategoryEnum.valueOf(rs.getString("i_category")))
+            .price(rs.getDouble("i_price"))
+            .build();
   }
 
   private DishIngredient mapResultSetToDishIngredient(ResultSet rs) throws SQLException {
     return DishIngredient.builder()
-        .id(rs.getInt("di_id"))
-        .quantityRequired(rs.getDouble("di_quantity_required"))
-        .unit(rs.getString("di_unit") != null ? UnitType.valueOf(rs.getString("di_unit")) : null)
-        .ingredient(findIngredientById(rs.getInt("id_ingredient")))
-        .build();
+            .id(rs.getInt("di_id"))
+            .quantityRequired(rs.getDouble("di_quantity_required"))
+            .unit(rs.getString("di_unit") != null ? UnitType.valueOf(rs.getString("di_unit")) : null)
+            .ingredient(findIngredientById(rs.getInt("id_ingredient"))
+                    .orElse(null))
+            .build();
   }
 }
