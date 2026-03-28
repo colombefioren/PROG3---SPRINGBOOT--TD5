@@ -134,15 +134,6 @@ public class DishRepositoryImpl implements DishRepository {
         .build();
   }
 
-  private Ingredient mapResultSetToIngredient(ResultSet rs) throws SQLException {
-    return Ingredient.builder()
-        .id(rs.getInt("i_id"))
-        .name(rs.getString("i_name"))
-        .category(CategoryEnum.valueOf(rs.getString("i_category")))
-        .price(rs.getDouble("i_price"))
-        .build();
-  }
-
   private DishIngredient mapResultSetToDishIngredient(ResultSet rs) throws SQLException {
     return DishIngredient.builder()
         .id(rs.getInt("di_id"))
