@@ -5,5 +5,5 @@ import org.td5.entity.StockMovement;
 import java.util.List;
 
 public interface StockMovementRepository {
-    List<StockMovement> findByIngredientId();
+    List<StockMovement> findByIngredientId(Integer ingredientId);
 }

@@ -71,29 +71,6 @@ select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_categ
     }
   }
 
-  @Override
-  public List<StockMovement> findStockMovementsByIngredientId(Integer id) {
-    String findStocksSql =
-        """
-                        select st.id as st_id, st.id_ingredient, st.quantity as st_quantity, st.type as st_type, st.unit as st_unit, st.creation_datetime as st_creation_datetime from stock_movement st where id_ingredient = ? order by st_creation_datetime desc
-                    """;
-
-    List<StockMovement> stockMovements = new ArrayList<>();
-
-    try (Connection conn = dataSource.getDBConnection();
-        PreparedStatement ps = conn.prepareStatement(findStocksSql); ) {
-      ps.setInt(1, id);
-      try (ResultSet rs = ps.executeQuery()) {
-        while (rs.next()) {
-          stockMovements.add(mapResultSetToStockMovement(rs));
-        }
-      }
-      return stockMovements;
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   private Ingredient mapResultSetToIngredient(ResultSet rs) throws SQLException {
     return Ingredient.builder()
         .id(rs.getInt("i_id"))
@@ -101,19 +78,6 @@ select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_categ
         .category(CategoryEnum.valueOf(rs.getString("i_category")))
         .price(rs.getDouble("i_price"))
         .stockMovementList(findStockMovementsByIngredientId(rs.getInt("i_id")))
-        .build();
-  }
-
-  private StockMovement mapResultSetToStockMovement(ResultSet rs) throws SQLException {
-    return StockMovement.builder()
-        .id(rs.getInt("st_id"))
-        .value(
-            StockValue.builder()
-                .quantity(rs.getDouble("st_quantity"))
-                .unit(UnitType.valueOf(rs.getString("st_unit")))
-                .build())
-        .type(MovementTypeEnum.valueOf(rs.getString("st_type")))
-        .creationDatetime(rs.getTimestamp("st_creation_datetime").toInstant())
         .build();
   }
 }
