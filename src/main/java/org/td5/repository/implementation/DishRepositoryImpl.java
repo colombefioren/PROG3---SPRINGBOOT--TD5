@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.td5.configuration.DataSource;
 import org.td5.entity.Dish;
+import org.td5.entity.DishIngredient;
 import org.td5.entity.Ingredient;
 import org.td5.repository.DishIngredientRepository;
 import org.td5.repository.DishRepository;
@@ -46,32 +47,54 @@ public class DishRepositoryImpl implements DishRepository {
 
   @Override
   public Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList) {
+    Connection conn = null;
+    try {
+      conn = dataSource.getDBConnection();
+      conn.setAutoCommit(false);
 
-    String deleteSql = "delete from dish_ingredient where id_dish = ?";
-    String insertSql = "insert into dish_ingredient (id_dish, id_ingredient) values (?, ?)";
+      dishIngredientRepository.deleteByDishId(dishId);
 
-    try (Connection conn = dataSource.getDBConnection()) {
-
-      try (PreparedStatement deletePs = conn.prepareStatement(deleteSql)) {
-        deletePs.setInt(1, dishId);
-        deletePs.executeUpdate();
-      }
-      try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+      if (ingredientList != null && !ingredientList.isEmpty()) {
+        List<DishIngredient> newDishIngredients = new ArrayList<>();
 
         for (Ingredient ingredient : ingredientList) {
           if (ingredient != null && ingredient.getId() != null) {
-            insertPs.setInt(1, dishId);
-            insertPs.setInt(2, ingredient.getId());
-            insertPs.addBatch();
+            DishIngredient dishIngredient =
+                DishIngredient.builder()
+                    .dish(Dish.builder().id(dishId).build())
+                    .ingredient(ingredient)
+                    .quantityRequired(null)
+                    .unit(null)
+                    .build();
+            newDishIngredients.add(dishIngredient);
           }
         }
-        insertPs.executeBatch();
+
+        dishIngredientRepository.saveAll(newDishIngredients);
       }
+
+      conn.commit();
 
       return findById(dishId).orElse(null);
 
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      if (conn != null) {
+        try {
+          conn.rollback();
+        } catch (SQLException rollbackEx) {
+          throw new RuntimeException("Failed to rollback transaction", rollbackEx);
+        }
+      }
+      throw new RuntimeException("Failed to update dish ingredients", e);
+    } finally {
+      if (conn != null) {
+        try {
+          conn.setAutoCommit(true);
+          conn.close();
+        } catch (SQLException e) {
+          System.err.println("Error closing connection: " + e.getMessage());
+        }
+      }
     }
   }
 
