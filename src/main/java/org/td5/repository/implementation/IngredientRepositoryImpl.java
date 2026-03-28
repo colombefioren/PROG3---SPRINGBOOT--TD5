@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.td5.configuration.DataSource;
@@ -47,13 +48,11 @@ select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_categ
   }
 
   @Override
-  public Ingredient findById(Integer id) {
+  public Optional<Ingredient> findById(Integer id) {
     String sql =
-"""
-                  select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_category from ingredient i where i.id = ?
-""";
-
-    Ingredient ingredient = null;
+        """
+                              select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_category from ingredient i where i.id = ?
+            """;
 
     try (Connection conn = dataSource.getDBConnection();
         PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -62,11 +61,11 @@ select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_categ
       try (ResultSet rs = ps.executeQuery()) {
 
         if (rs.next()) {
-          ingredient = mapResultSetToIngredient(rs);
+          return Optional.of(mapResultSetToIngredient(rs));
         }
       }
 
-      return ingredient;
+      return Optional.empty();
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
