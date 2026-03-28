@@ -58,7 +58,7 @@ values (?,?,?,?)
     try (Connection conn = dataSource.getDBConnection();
         PreparedStatement pstmt = conn.prepareStatement(sql)) {
       for (DishIngredient dishIngredient : dishIngredients) {
-        pstmt.setInt(1, dishIngredient.getId());
+        pstmt.setInt(1, dishIngredient.getDish().getId());
         pstmt.setInt(2, dishIngredient.getIngredient().getId());
         pstmt.setDouble(3, dishIngredient.getQuantityRequired());
         pstmt.setString(4, dishIngredient.getUnit().toString());

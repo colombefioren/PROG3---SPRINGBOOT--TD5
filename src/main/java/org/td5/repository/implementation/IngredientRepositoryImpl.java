@@ -11,11 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.td5.configuration.DataSource;
 import org.td5.entity.Ingredient;
-import org.td5.entity.StockMovement;
-import org.td5.entity.StockValue;
 import org.td5.entity.enums.CategoryEnum;
-import org.td5.entity.enums.MovementTypeEnum;
-import org.td5.entity.enums.UnitType;
 import org.td5.repository.IngredientRepository;
 import org.td5.repository.StockMovementRepository;
 
