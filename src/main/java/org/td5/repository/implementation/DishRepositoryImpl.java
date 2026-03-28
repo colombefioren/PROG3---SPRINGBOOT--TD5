@@ -16,11 +16,13 @@ import org.td5.entity.Ingredient;
 import org.td5.entity.enums.CategoryEnum;
 import org.td5.entity.enums.UnitType;
 import org.td5.repository.DishRepository;
+import org.td5.repository.IngredientRepository;
 
 @Repository
 @AllArgsConstructor
 public class DishRepositoryImpl implements DishRepository {
   private final DataSource dataSource;
+  private final IngredientRepository ingredientRepository;
 
   @Override
   public List<Dish> findAll() {
@@ -123,29 +125,6 @@ public class DishRepositoryImpl implements DishRepository {
     }
   }
 
-  private Optional<Ingredient> findIngredientById(Integer id) {
-    String sql =
-        """
-                                      select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_category from ingredient i where i.id = ?
-                    """;
-
-    try (Connection conn = dataSource.getDBConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)) {
-      ps.setInt(1, id);
-
-      try (ResultSet rs = ps.executeQuery()) {
-
-        if (rs.next()) {
-          return Optional.of(mapResultSetToIngredient(rs));
-        }
-      }
-
-      return Optional.empty();
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   private Dish mapResultSetToDish(ResultSet rs) throws SQLException {
     return Dish.builder()
         .id(rs.getInt("d_id"))
@@ -169,7 +148,7 @@ public class DishRepositoryImpl implements DishRepository {
         .id(rs.getInt("di_id"))
         .quantityRequired(rs.getDouble("di_quantity_required"))
         .unit(rs.getString("di_unit") != null ? UnitType.valueOf(rs.getString("di_unit")) : null)
-        .ingredient(findIngredientById(rs.getInt("id_ingredient")).orElse(null))
+        .ingredient(ingredientRepository.findById(rs.getInt("id_ingredient")).orElse(null))
         .build();
   }
 }
