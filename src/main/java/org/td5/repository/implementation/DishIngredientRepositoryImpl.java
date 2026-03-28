@@ -48,7 +48,26 @@ public class DishIngredientRepositoryImpl implements DishIngredientRepository {
   }
 
   @Override
-  public void saveAll(List<DishIngredient> dishIngredients) {}
+  public void saveAll(List<DishIngredient> dishIngredients) {
+    String sql = """
+insert into dish_ingredient (id_dish,id_ingredient,quantity_required,unit)
+values (?,?,?,?)
+""";
+
+    try(Connection conn = dataSource.getDBConnection();
+    PreparedStatement pstmt = conn.prepareStatement(sql)){
+      for(DishIngredient dishIngredient : dishIngredients) {
+        pstmt.setInt(1, dishIngredient.getId());
+        pstmt.setInt(2,dishIngredient.getIngredient().getId());
+        pstmt.setDouble(3, dishIngredient.getQuantityRequired());
+        pstmt.setString(4,dishIngredient.getUnit().toString());
+        pstmt.addBatch();
+      }
+      pstmt.executeBatch();
+    } catch (SQLException e) {
+        throw new RuntimeException(e);
+    }
+  }
 
   @Override
   public void deleteByDishId(Integer dishId) {}
