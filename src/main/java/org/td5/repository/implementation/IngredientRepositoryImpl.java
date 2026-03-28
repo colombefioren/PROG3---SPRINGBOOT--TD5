@@ -17,11 +17,13 @@ import org.td5.entity.enums.CategoryEnum;
 import org.td5.entity.enums.MovementTypeEnum;
 import org.td5.entity.enums.UnitType;
 import org.td5.repository.IngredientRepository;
+import org.td5.repository.StockMovementRepository;
 
 @Repository
 @AllArgsConstructor
 public class IngredientRepositoryImpl implements IngredientRepository {
   private final DataSource dataSource;
+  private final StockMovementRepository stockMovementRepository;
 
   @Override
   public List<Ingredient> findAll() {
@@ -77,7 +79,7 @@ select i.id as i_id, i.name as i_name, i.price as i_price, i.category as i_categ
         .name(rs.getString("i_name"))
         .category(CategoryEnum.valueOf(rs.getString("i_category")))
         .price(rs.getDouble("i_price"))
-        .stockMovementList(findStockMovementsByIngredientId(rs.getInt("i_id")))
+        .stockMovementList(stockMovementRepository.findByIngredientId(rs.getInt("i_id")))
         .build();
   }
 }
