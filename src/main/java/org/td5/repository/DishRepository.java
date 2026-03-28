@@ -1,16 +1,14 @@
 package org.td5.repository;
 
-import org.td5.entity.Dish;
-import org.td5.entity.DishIngredient;
-import org.td5.entity.Ingredient;
-
 import java.util.List;
 import java.util.Optional;
+import org.td5.entity.Dish;
+import org.td5.entity.Ingredient;
 
 public interface DishRepository {
-    List<Dish> findAll();
-    Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList);
-    List<DishIngredient> findDishIngredientsByDishId(Integer dishId);
-    Optional<Dish> findById(Integer id);
+  List<Dish> findAll();
 
+  Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList);
+
+  Optional<Dish> findById(Integer id);
 }

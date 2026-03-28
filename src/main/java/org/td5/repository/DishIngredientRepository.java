@@ -5,7 +5,7 @@ import org.td5.entity.DishIngredient;
 import java.util.List;
 
 public interface DishIngredientRepository {
-    List<DishIngredient> findById(Integer dishId);
+    List<DishIngredient> findByDishId(Integer dishId);
     void saveAll(List<DishIngredient> dishIngredients);
     void deleteByDishId(Integer dishId);
 }
