@@ -31,16 +31,4 @@ public class DataSource {
     public Connection getDBConnection() throws SQLException {
         return DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
     }
-
-    public void attemptCloseDBConnection(AutoCloseable... resources) {
-        for (AutoCloseable resource : resources) {
-            if (resource != null) {
-                try {
-                    resource.close();
-                } catch (Exception e) {
-                    System.out.println("Error while trying to close the resource" + e);
-                }
-            }
-        }
-    }
 }
