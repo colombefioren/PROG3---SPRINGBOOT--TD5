@@ -190,7 +190,11 @@ public class DishRepositoryImpl implements DishRepository {
   public Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList) {
     String deleteSql = "delete from dish_ingredient where id_dish = ?";
     String insertSql =
-        "insert into dish_ingredient (id_dish, id_ingredient, quantity_required, unit) values (?, ?, ?, ?) on conflict do nothing";
+        """
+            insert into dish_ingredient (id_dish, id_ingredient, quantity_required, unit)
+            select ?, ?, ?, ?::unit_type
+            where exists (select 1 from ingredient where id = ?)
+            """;
 
     Connection conn = null;
     try {
@@ -205,11 +209,14 @@ public class DishRepositoryImpl implements DishRepository {
       if (ingredientList != null && !ingredientList.isEmpty()) {
         try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
           for (Ingredient ingredient : ingredientList) {
-            ps.setInt(1, dishId);
-            ps.setInt(2, ingredient.getId());
-            ps.setDouble(3, 0.0);
-            ps.setString(4, null);
-            ps.addBatch();
+            if (ingredient != null && ingredient.getId() != null) {
+              ps.setInt(1, dishId);
+              ps.setInt(2, ingredient.getId());
+              ps.setDouble(3, 0.0);
+              ps.setString(4, null);
+              ps.setInt(5, ingredient.getId());
+              ps.addBatch();
+            }
           }
           ps.executeBatch();
         }
@@ -227,7 +234,7 @@ public class DishRepositoryImpl implements DishRepository {
           throw new RuntimeException("failed to rollback transaction", rollbackEx);
         }
       }
-      throw new RuntimeException("failed to update dish ingredients", e);
+      throw new RuntimeException(e);
     } finally {
       if (conn != null) {
         try {
