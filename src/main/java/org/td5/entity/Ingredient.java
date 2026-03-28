@@ -24,7 +24,7 @@ public class Ingredient {
 
   public StockValue getStockValue(Instant instant, UnitType unit) {
     if (stockMovementList == null || stockMovementList.isEmpty()) {
-      return new StockValue(0.0, UnitType.KG);
+      return new StockValue(0.0, unit);
     }
     double total = 0.0;
     for (StockMovement movement : stockMovementList) {
@@ -37,6 +37,6 @@ public class Ingredient {
         }
       }
     }
-    return new StockValue(total, UnitType.KG);
+    return new StockValue(total, unit);
   }
 }
