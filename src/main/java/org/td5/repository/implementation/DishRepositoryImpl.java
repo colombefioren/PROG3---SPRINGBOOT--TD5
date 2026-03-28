@@ -190,7 +190,7 @@ public class DishRepositoryImpl implements DishRepository {
   public Dish updateIngredientsInDish(Integer dishId, List<Ingredient> ingredientList) {
     String deleteSql = "delete from dish_ingredient where id_dish = ?";
     String insertSql =
-        "insert into dish_ingredient (id_dish, id_ingredient, quantity_required, unit) values (?, ?, ?, ?)";
+        "insert into dish_ingredient (id_dish, id_ingredient, quantity_required, unit) values (?, ?, ?, ?) on conflict do nothing";
 
     Connection conn = null;
     try {
