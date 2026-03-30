@@ -5,9 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -29,69 +27,31 @@ public class IngredientRepositoryImpl implements IngredientRepository {
   public List<Ingredient> findAll() {
     String sql =
         """
-            with stock_movements_data as (
-                select
-                    sm.id_ingredient,
-                    sm.id as sm_id,
-                    sm.quantity,
-                    sm.type,
-                    sm.unit,
-                    sm.creation_datetime
-                from stock_movement sm
-                order by sm.creation_datetime desc
-            )
             select
                 i.id as i_id,
                 i.name as i_name,
                 i.price as i_price,
-                i.category as i_category,
-                smd.sm_id,
-                smd.quantity as sm_quantity,
-                smd.type as sm_type,
-                smd.unit as sm_unit,
-                smd.creation_datetime as sm_creation_datetime
+                i.category as i_category
             from ingredient i
-            left join stock_movements_data smd on i.id = smd.id_ingredient
-            order by i.id, smd.creation_datetime desc
+            order by i.id
             """;
 
-    Map<Integer, Ingredient> ingredientMap = new HashMap<>();
+    List<Ingredient> ingredients = new ArrayList<>();
 
     try (Connection conn = dataSource.getDBConnection();
         PreparedStatement ps = conn.prepareStatement(sql);
         ResultSet rs = ps.executeQuery()) {
 
       while (rs.next()) {
-        Integer ingredientId = rs.getInt("i_id");
-        Ingredient ingredient = ingredientMap.get(ingredientId);
-
-        if (ingredient == null) {
-          ingredient = new Ingredient();
-          ingredient.setId(ingredientId);
-          ingredient.setName(rs.getString("i_name"));
-          ingredient.setPrice(rs.getDouble("i_price"));
-          ingredient.setCategory(CategoryEnum.valueOf(rs.getString("i_category")));
-          ingredient.setStockMovementList(new ArrayList<>());
-          ingredientMap.put(ingredientId, ingredient);
-        }
-
-        if (rs.getObject("sm_id") != null) {
-          StockMovement stockMovement = new StockMovement();
-          stockMovement.setId(rs.getInt("sm_id"));
-
-          StockValue stockValue = new StockValue();
-          stockValue.setQuantity(rs.getDouble("sm_quantity"));
-          stockValue.setUnit(UnitType.valueOf(rs.getString("sm_unit")));
-          stockMovement.setValue(stockValue);
-
-          stockMovement.setType(MovementTypeEnum.valueOf(rs.getString("sm_type")));
-          stockMovement.setCreationDatetime(rs.getTimestamp("sm_creation_datetime").toInstant());
-
-          ingredient.getStockMovementList().add(stockMovement);
-        }
+        Ingredient ingredient = new Ingredient();
+        ingredient.setId(rs.getInt("i_id"));
+        ingredient.setName(rs.getString("i_name"));
+        ingredient.setPrice(rs.getDouble("i_price"));
+        ingredient.setCategory(CategoryEnum.valueOf(rs.getString("i_category")));
+        ingredients.add(ingredient);
       }
 
-      return new ArrayList<>(ingredientMap.values());
+      return ingredients;
 
     } catch (SQLException e) {
       throw new RuntimeException("error fetching all ingredients", e);

@@ -10,6 +10,7 @@ import org.td5.entity.enums.DishTypeEnum;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -21,8 +22,12 @@ public class Dish {
     private Double price;
     @JsonIgnore
     private DishTypeEnum dishType;
-    @JsonProperty(value="ingredients")
+    @JsonIgnore
     private List<DishIngredient> dishIngredients;
+
+    public List<Ingredient> getIngredients() {
+        return dishIngredients.stream().map(DishIngredient::getIngredient).collect(Collectors.toList());
+    }
 
     public void setDishIngredients(List<DishIngredient> newDishIngredients) {
         if (this.dishIngredients != null && !this.dishIngredients.isEmpty()) {
