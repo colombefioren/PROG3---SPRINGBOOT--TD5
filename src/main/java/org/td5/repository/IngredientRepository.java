@@ -11,5 +11,5 @@ public interface IngredientRepository {
 
   Optional<Ingredient> findById(Integer id);
 
-  List<StockMovement> createStockMovementsByIngredientId(Integer id, List<StockMovement> movements);
+  void createStockMovementsByIngredientId(Integer id, List<StockMovement> movements);
 }

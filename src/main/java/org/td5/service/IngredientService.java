@@ -41,13 +41,13 @@ public class IngredientService {
     return ingredient.getStockMovements(from,to);
   }
 
-  public List<StockMovement> postIngredientStockMovements(Integer id, List<StockMovementBody> stockMovementBodies) throws NotFoundException {
+  public void postIngredientStockMovements(Integer id, List<StockMovementBody> stockMovementBodies) throws NotFoundException {
     repository.findById(id).orElseThrow(() -> new NotFoundException("Ingredient.id=" + id + " is not found"));
 
 
     List<StockMovement> movements = stockMovementBodies.stream().map(stb ->
-            StockMovement.builder().type(stb.getMovementType()).value(StockValue.builder().quantity(stb.getValue()).unit(stb.getUnit()).build()).build()).toList();
-    return repository.createStockMovementsByIngredientId(id,movements);
+            StockMovement.builder().type(stb.getType()).value(StockValue.builder().quantity(stb.getValue()).unit(stb.getUnit()).build()).build()).toList();
+      repository.createStockMovementsByIngredientId(id, movements);
 
   }
 }

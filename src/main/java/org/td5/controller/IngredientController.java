@@ -71,7 +71,8 @@ public class IngredientController {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A body must be provided");
     }
     try{
-      return ResponseEntity.status(HttpStatus.CREATED).body(service.postIngredientStockMovements(id,stockMovementBodies));
+      service.postIngredientStockMovements(id,stockMovementBodies);
+      return ResponseEntity.status(HttpStatus.CREATED).body("StockMovement successfully added");
     }
     catch (NotFoundException e){
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

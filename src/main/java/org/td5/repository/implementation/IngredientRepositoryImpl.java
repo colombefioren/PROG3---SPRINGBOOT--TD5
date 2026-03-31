@@ -133,14 +133,13 @@ public class IngredientRepositoryImpl implements IngredientRepository {
   }
 
   @Override
-  public List<StockMovement> createStockMovementsByIngredientId(Integer id,List<StockMovement> movements) {
+  public void createStockMovementsByIngredientId(Integer id,List<StockMovement> movements) {
     String sql = """
         INSERT INTO stock_movement (id_ingredient, quantity, type, unit, creation_datetime)
         VALUES (?, ?, ?::movement_type, ?::unit_type, ?)
         RETURNING id, creation_datetime
         """;
 
-    List<StockMovement> createdMovements = new ArrayList<>();
     Connection conn = null;
 
     try {
@@ -154,25 +153,11 @@ public class IngredientRepositoryImpl implements IngredientRepository {
           ps.setString(3, movement.getType().name());
           ps.setString(4, movement.getValue().getUnit().name());
           ps.setTimestamp(5, Timestamp.from(Instant.now()));
-
-          try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-              StockMovement created = new StockMovement();
-              created.setId(rs.getInt("id"));
-              StockValue stockValue = new StockValue();
-              stockValue.setQuantity(rs.getDouble("sm_quantity"));
-              stockValue.setUnit(UnitType.valueOf(rs.getString("sm_unit")));
-              created.setType(movement.getType());
-              created.setValue(stockValue);
-              created.setCreationDatetime(rs.getTimestamp("creation_datetime").toInstant());
-              createdMovements.add(created);
-            }
-          }
+          ps.executeQuery();
         }
       }
 
       conn.commit();
-      return createdMovements;
 
     } catch (SQLException e) {
       if (conn != null) {

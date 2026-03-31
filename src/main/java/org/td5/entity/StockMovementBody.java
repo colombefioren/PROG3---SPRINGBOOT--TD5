@@ -12,5 +12,5 @@ import org.td5.entity.enums.UnitType;
 public class StockMovementBody {
     private UnitType unit;
     private Double value;
-    private MovementTypeEnum movementType;
+    private MovementTypeEnum type;
 }
