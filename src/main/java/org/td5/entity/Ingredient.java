@@ -42,13 +42,19 @@ public class Ingredient {
   }
 
   @JsonIgnore
-  public List<StockMovement> getStockMovements(Instant from,Instant to) {
+  public List<StockMovement> getStockMovements(Instant from, Instant to) {
     if (stockMovementList == null || stockMovementList.isEmpty()) {
       return new ArrayList<>();
     }
+
+    if (from == null || to == null) {
+      return new ArrayList<>();
+    }
+
     List<StockMovement> stockMovements = new ArrayList<>();
     for (StockMovement movement : stockMovementList) {
-      if(movement.getCreationDatetime().isAfter(from) && movement.getCreationDatetime().isBefore(to)) {
+      if (!movement.getCreationDatetime().isBefore(from) &&
+              !movement.getCreationDatetime().isAfter(to)) {
         stockMovements.add(movement);
       }
     }
