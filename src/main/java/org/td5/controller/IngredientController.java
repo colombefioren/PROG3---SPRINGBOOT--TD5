@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.td5.entity.Ingredient;
+import org.td5.entity.StockMovement;
+import org.td5.entity.StockMovementBody;
 import org.td5.entity.enums.UnitType;
 import org.td5.exception.NotFoundException;
 import org.td5.service.IngredientService;
@@ -61,5 +63,19 @@ public class IngredientController {
     }catch (Exception e){
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
+  }
+
+  @PostMapping("/{id}/stockMovements")
+  public ResponseEntity<?> postIngredientStockMovements(@PathVariable Integer id, @RequestParam(required = false) Instant from, @RequestBody(required = false) List<StockMovementBody> stockMovementBodies) {
+    if(stockMovementBodies == null || stockMovementBodies.isEmpty()){
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A body must be provided");
+    }
+    try{
+      return ResponseEntity.status(HttpStatus.CREATED).body(service.postIngredientStockMovements(id,stockMovementBodies));
+    }
+    catch (NotFoundException e){
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    } catch (Exception e) {
+return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());    }
   }
 }

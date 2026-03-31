@@ -1,9 +1,7 @@
 package org.td5.repository.implementation;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.td5.configuration.DataSource;
 import org.td5.entity.Ingredient;
 import org.td5.entity.StockMovement;
+import org.td5.entity.StockMovementBody;
 import org.td5.entity.StockValue;
 import org.td5.entity.enums.CategoryEnum;
 import org.td5.entity.enums.MovementTypeEnum;
@@ -130,6 +129,69 @@ public class IngredientRepositoryImpl implements IngredientRepository {
 
     } catch (SQLException e) {
       throw new RuntimeException("error fetching ingredient by id: " + id, e);
+    }
+  }
+
+  @Override
+  public List<StockMovement> createStockMovementsByIngredientId(Integer id,List<StockMovement> movements) {
+    String sql = """
+        INSERT INTO stock_movement (id_ingredient, quantity, type, unit, creation_datetime)
+        VALUES (?, ?, ?::movement_type, ?::unit_type, ?)
+        RETURNING id, creation_datetime
+        """;
+
+    List<StockMovement> createdMovements = new ArrayList<>();
+    Connection conn = null;
+
+    try {
+      conn = dataSource.getDBConnection();
+      conn.setAutoCommit(false);
+
+      try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        for (StockMovement movement : movements) {
+          ps.setInt(1, id);
+          ps.setDouble(2, movement.getValue().getQuantity());
+          ps.setString(3, movement.getType().name());
+          ps.setString(4, movement.getValue().getUnit().name());
+          ps.setTimestamp(5, Timestamp.from(Instant.now()));
+
+          try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+              StockMovement created = new StockMovement();
+              created.setId(rs.getInt("id"));
+              StockValue stockValue = new StockValue();
+              stockValue.setQuantity(rs.getDouble("sm_quantity"));
+              stockValue.setUnit(UnitType.valueOf(rs.getString("sm_unit")));
+              created.setType(movement.getType());
+              created.setValue(stockValue);
+              created.setCreationDatetime(rs.getTimestamp("creation_datetime").toInstant());
+              createdMovements.add(created);
+            }
+          }
+        }
+      }
+
+      conn.commit();
+      return createdMovements;
+
+    } catch (SQLException e) {
+      if (conn != null) {
+        try {
+          conn.rollback();
+        } catch (SQLException rollbackEx) {
+          throw new RuntimeException("failed to rollback transaction", rollbackEx);
+        }
+      }
+      throw new RuntimeException("error adding stock movements for ingredient: " + id, e);
+    } finally {
+      if (conn != null) {
+        try {
+          conn.setAutoCommit(true);
+          conn.close();
+        } catch (SQLException e) {
+          System.err.println("error closing connection: " + e.getMessage());
+        }
+      }
     }
   }
 }
