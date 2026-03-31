@@ -47,4 +47,19 @@ public class IngredientController {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
   }
+
+  @GetMapping("/{id}/stockMovements")
+  public ResponseEntity<?> getIngredientStockMovements(@PathVariable Integer id, @RequestParam(required = false) Instant from, @RequestParam(required = false) Instant to) {
+    if(from == null || to == null){
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+              .body("Either mandatory query parameter `from` or `to` is not provided");
+    }
+    try{
+      return ResponseEntity.status(HttpStatus.OK).body(service.getIngredientStockMovements(id,from,to));
+    }catch (NotFoundException e){
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }catch (Exception e){
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+  }
 }

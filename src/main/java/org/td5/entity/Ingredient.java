@@ -2,6 +2,7 @@ package org.td5.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,5 +39,19 @@ public class Ingredient {
       }
     }
     return new StockValue(total, unit);
+  }
+
+  @JsonIgnore
+  public List<StockMovement> getStockMovements(Instant from,Instant to) {
+    if (stockMovementList == null || stockMovementList.isEmpty()) {
+      return new ArrayList<>();
+    }
+    List<StockMovement> stockMovements = new ArrayList<>();
+    for (StockMovement movement : stockMovementList) {
+      if(movement.getCreationDatetime().isAfter(from) && movement.getCreationDatetime().isBefore(to)) {
+        stockMovements.add(movement);
+      }
+    }
+    return stockMovements;
   }
 }
