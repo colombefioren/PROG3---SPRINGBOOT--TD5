@@ -95,12 +95,57 @@ paths:
                 items:
                   $ref: '#/components/schemas/Dish'
 
+  /dishes/{id}/ingredients:
+    put:
+      tags:
+        - Dishes
+      summary: Update ingredients associated with a dish
+      description: Allows associating or dissociating a list of ingredients to the dish identified by id
+      parameters:
+        - $ref: '#/components/parameters/DishIdentifierPathParameter'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Ingredient'
+      responses:
+        200:
+          description: Updated dish with its ingredients
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dish'
+        400:
+          description: Missing request body
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Request body is mandatory
+        404:
+          description: Dish not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Dish.id=1 is not found
+
 components:
   parameters:
     IngredientIdentifierPathParameter:
       in: path
       name: id
       description: Ingredient identifier
+      schema:
+        type: integer
+      required: true
+    DishIdentifierPathParameter:
+      in: path
+      name: id
+      description: Dish identifier
       schema:
         type: integer
       required: true
