@@ -47,6 +47,38 @@ paths:
                 type: string
                 example: Ingredient.id=1 is not found
 
+  /ingredients/{id}/stock:
+    get:
+      tags:
+        - Ingredients
+      summary: Get stock value of an ingredient at a specific time
+      description: Returns the stock value for the ingredient with the provided identifier at the specified time and unit
+      parameters:
+        - $ref: '#/components/parameters/IngredientIdentifierPathParameter'
+        - $ref: '#/components/parameters/AtQueryParameter'
+        - $ref: '#/components/parameters/UnitQueryParameter'
+      responses:
+        200:
+          description: Stock value retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockValue'
+        400:
+          description: Missing mandatory query parameter
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Either mandatory query parameter `at` or `unit` is not provided.
+        404:
+          description: Ingredient not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Ingredient.id=1 is not found
+
 
 components:
   parameters:
@@ -57,6 +89,22 @@ components:
       schema:
         type: integer
       required: true
+    AtQueryParameter:
+      in: query
+      name: at
+      description: Timestamp at which to retrieve the stock value
+      schema:
+        type: string
+        format: date-time
+      required: true
+    UnitQueryParameter:
+      in: query
+      name: unit
+      description: Unit of measurement for the stock
+      schema:
+        $ref: '#/components/schemas/UnitType'
+      required: true
+
   schemas:
     CategoryEnum:
       type: string
@@ -66,6 +114,12 @@ components:
         - MARINE
         - DAIRY
         - OTHER
+    UnitType:
+      type: string
+      enum:
+        - KG
+        - PCS
+        - L
     Ingredient:
       type: object
       properties:
@@ -81,3 +135,12 @@ components:
           type: number
           format: float
           example: 2.5
+    StockValue:
+      type: object
+      properties:
+        quantity:
+          type: number
+          format: float
+          example: 15.5
+        unit:
+          $ref: '#/components/schemas/UnitType'
