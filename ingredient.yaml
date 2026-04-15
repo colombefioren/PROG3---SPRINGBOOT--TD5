@@ -79,6 +79,21 @@ paths:
                 type: string
                 example: Ingredient.id=1 is not found
 
+  /dishes:
+    get:
+      tags:
+        - Dishes
+      summary: Get all dishes
+      description: Returns list of dishes
+      responses:
+        200:
+          description: List of dishes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dish'
 
 components:
   parameters:
@@ -144,3 +159,20 @@ components:
           example: 15.5
         unit:
           $ref: '#/components/schemas/UnitType'
+    Dish:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Niçoise Salad
+        price:
+          type: number
+          format: float
+          example: 12.9
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ingredient'
