@@ -173,24 +173,6 @@ components:
         $ref: '#/components/schemas/UnitType'
       required: true
 
-    FromQueryParameter:
-      in: query
-      name: from
-      description: Start date and time for filtering
-      schema:
-        type: string
-        format: date-time
-      required: true
-
-    ToQueryParameter:
-      in: query
-      name: to
-      description: End date and time for filtering
-      schema:
-        type: string
-        format: date-time
-      required: true
-
   schemas:
 
     CategoryEnum:
@@ -208,12 +190,6 @@ components:
         - KG
         - PCS
         - L
-
-    MovementTypeEnum:
-      type: string
-      enum:
-        - IN
-        - OUT
 
     Ingredient:
       type: object
