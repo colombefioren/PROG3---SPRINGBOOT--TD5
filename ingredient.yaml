@@ -23,7 +23,40 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Ingredient'
+
+  /ingredients/{id}:
+    get:
+      tags:
+        - Ingredients
+      summary: Get an ingredient by ID
+      description: Returns an ingredient based on its id
+      parameters:
+        - $ref: '#/components/parameters/IngredientIdentifierPathParameter'
+      responses:
+        200:
+          description: Ingredient found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+        404:
+          description: Ingredient not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Ingredient.id=1 is not found
+
+
 components:
+  parameters:
+    IngredientIdentifierPathParameter:
+      in: path
+      name: id
+      description: Ingredient identifier
+      schema:
+        type: integer
+      required: true
   schemas:
     CategoryEnum:
       type: string
