@@ -83,72 +83,6 @@ paths:
                 type: string
                 example: Ingredient.id=1 is not found
 
-  /ingredients/{id}/stockMovements:
-    get:
-      tags:
-        - Ingredients
-      summary: Get stock movements of an ingredient filtered by date range
-      description: Returns a list of stock movements for the specified ingredient
-      parameters:
-        - $ref: '#/components/parameters/IngredientIdentifierPathParameter'
-        - $ref: '#/components/parameters/FromQueryParameter'
-        - $ref: '#/components/parameters/ToQueryParameter'
-      responses:
-        200:
-          description: List of filtered stock movements
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/StockMovement'
-        404:
-          description: Ingredient not found
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: Ingredient.id=1 is not found
-
-    post:
-      tags:
-        - Ingredients
-      summary: Add stock movements to an ingredient
-      description: Creates a list of stock movements and associates them with the specified ingredient
-      parameters:
-        - $ref: '#/components/parameters/IngredientIdentifierPathParameter'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/StockMovementBody'
-      responses:
-        201:
-          description: List of created stock movements
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/StockMovement'
-        400:
-          description: Missing or invalid request body
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: Request body is mandatory
-        404:
-          description: Ingredient not found
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: Ingredient.id=1 is not found
-
   /dishes:
     get:
       tags:
@@ -306,37 +240,6 @@ components:
           example: 15.5
         unit:
           $ref: '#/components/schemas/UnitType'
-
-    StockMovement:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        creationDatetime:
-          type: string
-          format: date-time
-          example: 2025-04-15T10:30:00Z
-        unit:
-          $ref: '#/components/schemas/UnitType'
-        value:
-          type: number
-          format: float
-          example: 10.0
-        type:
-          $ref: '#/components/schemas/MovementTypeEnum'
-
-    StockMovementBody:
-      type: object
-      properties:
-        unit:
-          $ref: '#/components/schemas/UnitType'
-        value:
-          type: number
-          format: float
-          example: 10.0
-        type:
-          $ref: '#/components/schemas/MovementTypeEnum'
 
     Dish:
       type: object
