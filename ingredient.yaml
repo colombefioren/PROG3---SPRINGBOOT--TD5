@@ -8,7 +8,10 @@ servers:
 
 tags:
   - name: Ingredients
+  - name: Dishes
+
 paths:
+
   /ingredients:
     get:
       tags:
@@ -106,6 +109,7 @@ paths:
               schema:
                 type: string
                 example: Ingredient.id=1 is not found
+
     post:
       tags:
         - Ingredients
@@ -200,6 +204,7 @@ paths:
                 example: Dish.id=1 is not found
 
 components:
+
   parameters:
     IngredientIdentifierPathParameter:
       in: path
@@ -208,6 +213,7 @@ components:
       schema:
         type: integer
       required: true
+
     DishIdentifierPathParameter:
       in: path
       name: id
@@ -215,6 +221,7 @@ components:
       schema:
         type: integer
       required: true
+
     AtQueryParameter:
       in: query
       name: at
@@ -223,6 +230,7 @@ components:
         type: string
         format: date-time
       required: true
+
     UnitQueryParameter:
       in: query
       name: unit
@@ -230,6 +238,7 @@ components:
       schema:
         $ref: '#/components/schemas/UnitType'
       required: true
+
     FromQueryParameter:
       in: query
       name: from
@@ -238,6 +247,7 @@ components:
         type: string
         format: date-time
       required: true
+
     ToQueryParameter:
       in: query
       name: to
@@ -246,7 +256,9 @@ components:
         type: string
         format: date-time
       required: true
+
   schemas:
+
     CategoryEnum:
       type: string
       enum:
@@ -255,17 +267,20 @@ components:
         - MARINE
         - DAIRY
         - OTHER
+
     UnitType:
       type: string
       enum:
         - KG
         - PCS
         - L
+
     MovementTypeEnum:
       type: string
       enum:
         - IN
         - OUT
+
     Ingredient:
       type: object
       properties:
@@ -281,6 +296,7 @@ components:
           type: number
           format: float
           example: 2.5
+
     StockValue:
       type: object
       properties:
@@ -290,6 +306,7 @@ components:
           example: 15.5
         unit:
           $ref: '#/components/schemas/UnitType'
+
     StockMovement:
       type: object
       properties:
@@ -308,6 +325,7 @@ components:
           example: 10.0
         type:
           $ref: '#/components/schemas/MovementTypeEnum'
+
     StockMovementBody:
       type: object
       properties:
@@ -319,6 +337,7 @@ components:
           example: 10.0
         type:
           $ref: '#/components/schemas/MovementTypeEnum'
+
     Dish:
       type: object
       properties:
